@@ -8,13 +8,13 @@ $cartItemCount = $db->count('carts', 'user_id = ?', [$currentUser['id']]) ?? 0;
     <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
 
         <!-- Logo -->
-        <a href="index.php" class="text-2xl font-extrabold text-white tracking-wide flex items-center">
+        <a href="./" class="text-2xl font-extrabold text-white tracking-wide flex items-center">
             ProductMarket<span class="text-blue-500">.uz</span>
         </a>
 
         <!-- Navigation Links -->
         <nav class="hidden md:flex items-center space-x-8">
-            <a href="index.php" class="text-white font-medium hover:text-blue-400 transition-colors">Home</a>
+            <a href="./" class="text-white font-medium hover:text-blue-400 transition-colors">Home</a>
             <a href="products.php" class="text-gray-300 hover:text-white transition-colors font-medium">Mahsulotlar</a>
         </nav>
 

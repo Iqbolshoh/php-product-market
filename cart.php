@@ -41,8 +41,8 @@ $cartItems = $db->execute('
 
 // Calculate total prices
 $subtotal = 0;
-foreach ($cartItems as $item) {
-    $subtotal += ($item['price'] * $item['quantity']);
+foreach ($cartItems as $cart) {
+    $subtotal += ($cart['price'] * $cart['quantity']);
 }
 
 // Additional costs (example logic)
@@ -120,15 +120,15 @@ $orderTotal = $subtotal + $shippingCost + $estimatedTax;
 
                 <!-- Left Column: Cart Items List -->
                 <div class="lg:col-span-2 space-y-6">
-                    <?php foreach ($cartItems as $item): ?>
+                    <?php foreach ($cartItems as $cart): ?>
                         <div
                             class="glass-panel rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6 hover:border-blue-500/30 transition-colors">
 
                             <!-- Product Image Placeholder or Actual Image -->
                             <div
                                 class="w-24 h-24 bg-gray-800/80 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden border border-gray-700/50">
-                                <?php if (!empty($item['image_url'])): ?>
-                                    <img src="<?= htmlspecialchars($item['image_url']) ?>" alt="Product"
+                                <?php if (!empty($cart['image_url'])): ?>
+                                    <img src="<?= htmlspecialchars($cart['image_url']) ?>" alt="Product"
                                         class="object-cover w-full h-full">
                                 <?php else: ?>
                                     <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,44 +141,15 @@ $orderTotal = $subtotal + $shippingCost + $estimatedTax;
 
                             <!-- Product Details -->
                             <div class="flex-grow text-center sm:text-left">
-                                <!-- Quantity Controller with Increase/Decrease Forms -->
-                                <div class="flex items-center space-x-2 bg-gray-900/50 rounded-xl p-1 border border-gray-700/50 w-max mt-4 sm:mt-0">
-
-                                    <!-- Decrease Form (-) -->
-                                    <form action="update-cart.php" method="POST" class="m-0 p-0 flex">
-                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                                        <input type="hidden" name="cart_id" value="<?= htmlspecialchars($item['cart_id']) ?>">
-                                        <input type="hidden" name="action" value="decrease">
-                                        <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white transition-colors" <?= $item['quantity'] <= 1 ? 'opacity-50 cursor-not-allowed' : '' ?>>
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                                            </svg>
-                                        </button>
-                                    </form>
-
-                                    <!-- Display Current Quantity -->
-                                    <span class="text-white font-bold w-8 text-center select-none">
-                                        <?= htmlspecialchars($item['quantity']) ?>
-                                    </span>
-
-                                    <!-- Increase Form (+) -->
-                                    <form action="update-cart.php" method="POST" class="m-0 p-0 flex">
-                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                                        <input type="hidden" name="cart_id" value="<?= htmlspecialchars($item['cart_id']) ?>">
-                                        <input type="hidden" name="action" value="increase">
-                                        <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                            </svg>
-                                        </button>
-                                    </form>
-
-                                </div>
+                                <h3 class="text-lg font-bold text-white mb-1"><?= htmlspecialchars($cart['name']) ?></h3>
+                                <p class="text-blue-400 font-bold mb-3">$<?= number_format($cart['price'], 2) ?></p>
 
                                 <!-- Action Form (Remove Item via POST) -->
                                 <form action="delete-cart.php" method="POST" class="inline-block">
+                                    <!-- Security Token -->
                                     <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
-                                    <input type="hidden" name="cart_id" value="<?= htmlspecialchars($item['cart_id']) ?>">
+                                    <!-- Target Item ID -->
+                                    <input type="hidden" name="cart_id" value="<?= htmlspecialchars($cart['cart_id']) ?>">
 
                                     <button type="submit" class="text-sm text-red-400 hover:text-red-300 transition-colors flex items-center justify-center sm:justify-start bg-transparent border-none cursor-pointer">
                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,27 +162,48 @@ $orderTotal = $subtotal + $shippingCost + $estimatedTax;
 
                             <!-- Quantity Controller -->
                             <div class="flex items-center space-x-3 bg-gray-900/50 rounded-xl p-1 border border-gray-700/50">
-                                <button
-                                    class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4">
-                                        </path>
-                                    </svg>
-                                </button>
-                                <span class="text-white font-medium w-6 text-center"><?= $item['quantity'] ?></span>
-                                <button
-                                    class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                </button>
+                                <div class="flex-grow text-center sm:text-left">
+                                    <!-- Quantity Controller with Increase/Decrease Forms -->
+                                    <div class="flex items-center space-x-2 bg-gray-900/50 rounded-xl p-1 border border-gray-700/50 w-max mt-4 sm:mt-0">
+
+                                        <!-- Decrease Form (-) -->
+                                        <form action="update-cart.php" method="POST" class="m-0 p-0 flex">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                            <input type="hidden" name="cart_id" value="<?= htmlspecialchars($cart['cart_id']) ?>">
+                                            <input type="hidden" name="action" value="decrease">
+                                            <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white transition-colors" <?= $cart['quantity'] <= 1 ? 'opacity-50 cursor-not-allowed' : '' ?>>
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+
+                                        <!-- Display Current Quantity -->
+                                        <span class="text-white font-bold w-8 text-center select-none">
+                                            <?= htmlspecialchars($cart['quantity']) ?>
+                                        </span>
+
+                                        <!-- Increase Form (+) -->
+                                        <form action="update-cart.php" method="POST" class="m-0 p-0 flex">
+                                            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                            <input type="hidden" name="cart_id" value="<?= htmlspecialchars($cart['cart_id']) ?>">
+                                            <input type="hidden" name="action" value="increase">
+                                            <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+
+                                    </div>
+
+                                </div>
                             </div>
 
                             <!-- Item Total Amount -->
                             <div class="w-24 text-right hidden sm:block">
                                 <span class="text-lg font-extrabold text-white">
-                                    $<?= number_format($item['price'] * $item['quantity'], 2) ?>
+                                    $<?= number_format($cart['price'] * $cart['quantity'], 2) ?>
                                 </span>
                             </div>
                         </div>

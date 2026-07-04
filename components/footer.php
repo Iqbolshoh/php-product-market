@@ -5,7 +5,7 @@
 
             <!-- Brand Info -->
             <div class="md:col-span-2">
-                <a href="index.php" class="text-2xl font-bold text-white tracking-wide block mb-4">
+                <a href="./" class="text-2xl font-bold text-white tracking-wide block mb-4">
                     ProductMarket<span class="text-blue-500">.uz</span>
                 </a>
                 <p class="text-gray-400 text-sm leading-relaxed max-w-sm mb-6">
@@ -30,7 +30,7 @@
             <div>
                 <h3 class="text-white font-semibold mb-5 uppercase tracking-wider text-sm">Navigation</h3>
                 <ul class="space-y-3">
-                    <li><a href="index.php" class="text-gray-400 hover:text-white hover:pl-1 transition-all text-sm block">Home</a></li>
+                    <li><a href="./" class="text-gray-400 hover:text-white hover:pl-1 transition-all text-sm block">Home</a></li>
                     <li><a href="products.php" class="text-gray-400 hover:text-white hover:pl-1 transition-all text-sm block">Mahsulotlar</a></li>
                     <li><a href="cart.php" class="text-gray-400 hover:text-white hover:pl-1 transition-all text-sm block">My Card</a></li>
                     <li><a href="profile.php" class="text-gray-400 hover:text-white hover:pl-1 transition-all text-sm block">Profile</a></li>
