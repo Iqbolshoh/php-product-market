@@ -14,6 +14,24 @@ $currentUser = $_SESSION['user'];
 
 $db = new Database();
 
+if (isset($_GET['add'])) {
+    $add = isset($_GET['add']) ? (int)$_GET['add'] : null;
+
+    $check = $db->select('carts', '*', 'user_id = ? AND product_id = ?', [$_SESSION['user']['id'], $add])[0] ?? null;
+
+    if ($check) {
+        $db->update('carts', ['quantity' => $check['quantity'] + 1], 'id = ?', [$check['id']]);
+    } else {
+        $db->insert('carts', [
+            'user_id' => $_SESSION['user']['id'],
+            'product_id' => $add,
+            'quantity' => 1
+        ]);
+    }
+
+    header("Location: products.php");
+}
+
 $cartItems = $db->execute('
     SELECT c.id AS cart_id, p.id AS product_id, p.name, p.price, p.image_url, c.quantity
     FROM carts c
@@ -123,19 +141,52 @@ $orderTotal = $subtotal + $shippingCost + $estimatedTax;
 
                             <!-- Product Details -->
                             <div class="flex-grow text-center sm:text-left">
-                                <h3 class="text-lg font-bold text-white mb-1"><?= htmlspecialchars($item['name']) ?></h3>
-                                <p class="text-blue-400 font-bold mb-3">$<?= number_format($item['price'], 2) ?></p>
+                                <!-- Quantity Controller with Increase/Decrease Forms -->
+                                <div class="flex items-center space-x-2 bg-gray-900/50 rounded-xl p-1 border border-gray-700/50 w-max mt-4 sm:mt-0">
 
-                                <!-- Action Buttons (Remove) -->
-                                <button
-                                    class="text-sm text-red-400 hover:text-red-300 transition-colors flex items-center justify-center sm:justify-start">
-                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                    Remove
-                                </button>
+                                    <!-- Decrease Form (-) -->
+                                    <form action="update-cart.php" method="POST" class="m-0 p-0 flex">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                        <input type="hidden" name="cart_id" value="<?= htmlspecialchars($item['cart_id']) ?>">
+                                        <input type="hidden" name="action" value="decrease">
+                                        <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white transition-colors" <?= $item['quantity'] <= 1 ? 'opacity-50 cursor-not-allowed' : '' ?>>
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+
+                                    <!-- Display Current Quantity -->
+                                    <span class="text-white font-bold w-8 text-center select-none">
+                                        <?= htmlspecialchars($item['quantity']) ?>
+                                    </span>
+
+                                    <!-- Increase Form (+) -->
+                                    <form action="update-cart.php" method="POST" class="m-0 p-0 flex">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                        <input type="hidden" name="cart_id" value="<?= htmlspecialchars($item['cart_id']) ?>">
+                                        <input type="hidden" name="action" value="increase">
+                                        <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-800 hover:text-white transition-colors">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+
+                                </div>
+
+                                <!-- Action Form (Remove Item via POST) -->
+                                <form action="delete-cart.php" method="POST" class="inline-block">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+                                    <input type="hidden" name="cart_id" value="<?= htmlspecialchars($item['cart_id']) ?>">
+
+                                    <button type="submit" class="text-sm text-red-400 hover:text-red-300 transition-colors flex items-center justify-center sm:justify-start bg-transparent border-none cursor-pointer">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                        </svg>
+                                        Remove
+                                    </button>
+                                </form>
                             </div>
 
                             <!-- Quantity Controller -->
