@@ -4,7 +4,7 @@
 define("DB_SERVER", "localhost");
 define("DB_USERNAME", "root");
 define("DB_PASSWORD", "");
-define("DB_NAME", "auth_master_db");
+define("DB_NAME", "product_market_db");
 
 // Set the system timezone to GMT-5
 date_default_timezone_set('Etc/GMT-5');
@@ -126,5 +126,19 @@ class Database
             "SELECT COUNT(*) as total FROM $table" . ($condition ? " WHERE $condition" : ""),
             $params
         )->fetch()['total'];
+    }
+
+    /**
+     * Generate CSRF token and store it in session.
+     *
+     * @return string The generated CSRF token.
+     */
+
+    public function generate_csrf_token()
+    {
+        if (empty($_SESSION['csrf_token'])) {
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        }
+        return $_SESSION['csrf_token'];
     }
 }

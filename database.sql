@@ -1,9 +1,9 @@
 -- DROP DATABASE IF EXISTS
-DROP DATABASE IF EXISTS auth_master_db;
+DROP DATABASE IF EXISTS product_market_db;
 
 -- CREATE DATABASE
-CREATE DATABASE auth_master_db;
-USE auth_master_db;
+CREATE DATABASE product_market_db;
+USE product_market_db;
 
 -- 1. USERS TABLE
 CREATE TABLE users (
@@ -16,18 +16,29 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- 2. ACTIVE SESSIONS TABLE
-CREATE TABLE active_sessions (
+-- 2. CATEGORIES TABLE
+CREATE TABLE categories (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    device_name VARCHAR(255) NOT NULL,
-    ip_address VARCHAR(45) NOT NULL,
-    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    session_token VARCHAR(255) UNIQUE NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- 3. PRODUCTS TABLE
+CREATE TABLE products (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    image_url VARCHAR(255),
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    discount_price DECIMAL(10, 2),
+    category_id INT,
+    FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- INSERTING USERS
-INSERT INTO users (first_name, last_name, email, username, password, role, profile_picture) VALUES 
-('Iqbolshoh', 'Ilhomjonov', 'iilhomjonov777@gmail.com', 'iqbolshoh', '$2y$10$FK1CG7WYwBbjC/rNTscuGOuH05Jqs.fxLxYB0rZ..Y1keEoDiEQMu', 'admin', '790d5772254c72bf5c01d43920d8e6a6.jpeg'),
-('User', 'User', 'user@iqbolshoh.uz', 'user',  '$2y$10$FK1CG7WYwBbjC/rNTscuGOuH05Jqs.fxLxYB0rZ..Y1keEoDiEQMu',  'user', 'default.png');
+INSERT INTO users (name, email, password, role) VALUES 
+('Iqbolshoh Ilhomjonov', 'iilhomjonov777@gmail.com', '$2y$10$FK1CG7WYwBbjC/rNTscuGOuH05Jqs.fxLxYB0rZ..Y1keEoDiEQMu', 'admin'),
+('Simple User', 'user@iqbolshoh.uz',  '$2y$10$FK1CG7WYwBbjC/rNTscuGOuH05Jqs.fxLxYB0rZ..Y1keEoDiEQMu',  'user');
